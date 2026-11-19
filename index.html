@@ -251,7 +251,7 @@ nav{padding:12px 18px}
 const $=id=>document.getElementById(id);
 const q$=s=>[...document.querySelectorAll(s)];
 
-/* Where orders go. First address is the main recipient, the rest are copied. Delivery goes through FormSubmit.co. */
+/* Where orders go. First address is the main recipient (the one FormSubmit activated), the rest are copied. Delivery goes through FormSubmit.co. */
 const TO="baobabcaterers@gmail.com";
 const CC="a.sheriff1@share.epsb.ca,k.hutchinson7@share.epsb.ca,b.paterson-young@share.epsb.ca";
 
@@ -296,6 +296,8 @@ const card=(x,j)=>`
     <p>${x.d}</p>
     <label class="hide" for="s${x.i}">Size</label>
     <select id="s${x.i}">${SZ[x.k].length>1?'<option value="">Choose size</option>':""}${SZ[x.k].map(z=>`<option>${z}</option>`).join("")}</select>
+    <label class="hide" for="q${x.i}">Quantity</label>
+    <input id="q${x.i}" type="number" min="1" max="99" value="1" inputmode="numeric" style="margin-top:10px" aria-label="Quantity">
     <button class="add" data-i="${x.i}">Add to cart</button>
   </div>
 </article>`;
@@ -317,7 +319,7 @@ $("look").innerHTML=[
 const prices=items.map(x=>`${money(x.p)} for the ${x.n.replace("ACES ","").toLowerCase()}`).join(", ");
 $("faqs").innerHTML=[
   ["What is ACES?","ACES is an apparel and footwear brand focused on clean designs, comfort, and everyday style."],
-  ["How do I order?","Pick your size, add items to your cart, and place your order with your name and email. We'll email you to confirm everything."],
+  ["How do I order?","Pick your size and quantity, add items to your cart, and place your order with your name and email. We'll email you to confirm everything."],
   ["How much does everything cost?","Prices in Canadian dollars: "+prices+"."],
   ["What sizes are available?","Apparel runs from Small up to a very generous "+SZ.top[7]+". Shoes are US 7 to 13, and hats and beanies are one size."],
   ["How do payment and delivery work?","After you place your order, we'll email you to confirm your items, arrange payment, and sort out pickup or delivery."]
@@ -368,8 +370,10 @@ $("prods").addEventListener("click",e=>{
   const b=e.target.closest(".add[data-i]");if(!b)return;
   const i=+b.dataset.i,sel=$("s"+i);
   if(!sel.value){sel.classList.remove("err");void sel.offsetWidth;sel.classList.add("err");sel.focus();return;}
+  const n=Math.max(1,Math.min(99,parseInt($("q"+i).value)||1));
   const l=cart.find(l=>l.i===i&&l.s===sel.value);
-  if(l)l.q=Math.min(99,l.q+1);else cart.push({i,s:sel.value,q:1});
+  if(l)l.q=Math.min(99,l.q+n);else cart.push({i,s:sel.value,q:n});
+  $("q"+i).value=1;
   save();render();
   b.textContent="Added ✓";setTimeout(()=>b.textContent="Add to cart",1200);
 });
