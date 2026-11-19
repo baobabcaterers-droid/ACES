@@ -405,7 +405,8 @@ $("v2").onsubmit=async e=>{
     cart=[];save();render();view("v3");
   }catch(err){
     const mail=`mailto:${TO}?cc=${CC}&subject=${encodeURIComponent("ACES order "+ref)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${body.Phone}\n\n${lines.join("\n")}\nTotal: ${money(total())}\n\nNotes: ${body.Notes}`)}`;
-    $("er").innerHTML=`We couldn't send your order just now. Please try again, or <a href="${mail}">email it to us instead</a>.`;
+    console.error("Order send failed:",err);
+    $("er").innerHTML=`We couldn't send your order just now (${String(err.message||err).replace(/[<>&]/g,"")}). Please try again, or <a href="${mail}">email it to us instead</a>.`;
   }
   btn.disabled=false;btn.textContent="Place order";
 };
